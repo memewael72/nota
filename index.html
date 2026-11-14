@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مفكرة كنيسة الملاك ميخائيل الروحية</title>
+    <style>
+        :root {
+            --church-purple: #4a154b;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --success: #2ecc71;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 680px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 15px;
+        }
+        .church-logo { font-size: 40px; margin-bottom: 5px; }
+        header h1 { margin: 0; font-size: 24px; color: var(--church-purple); }
+        .subtitle { margin: 5px 0 0; color: #718096; font-size: 14px; }
+        .daily-banner {
+            background: #ebf8ff;
+            border: 1px solid #bee3f8;
+            color: #2b6cb0;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-weight: bold;
+        }
+        .daily-banner.closed-week { background: #fff5f5; border-color: #fed7d7; color: #c53030; }
+        .timer-badge { background: var(--church-purple); color: white; padding: 4px 10px; border-radius: 8px; font-size: 13px; direction: ltr; }
+        .user-info-section { background: #f7fafc; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .input-group { display: flex; flex-direction: column; margin-bottom: 12px; }
+        .input-group label { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: var(--church-purple); }
+        .input-group input, .input-group select { padding: 12px; border: 2px solid #cbd5e0; border-radius: 10px; font-size: 15px; outline: none; }
+        .progress-section { background: #fffaf0; border: 1px solid #feebc8; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
+        .progress-bar-container { background: #edf2f7; border-radius: 10px; height: 14px; overflow: hidden; margin-bottom: 8px; }
+        .progress-bar { background: linear-gradient(90deg, var(--church-purple), var(--success)); width: 0%; height: 100%; transition: width 0.3s ease; }
+        .progress-text { margin: 0; font-weight: bold; font-size: 14px; }
+        #progressPercent { color: var(--success); }
+        .section-title { font-size: 16px; color: var(--church-purple); margin-bottom: 8px; font-weight: bold; }
+        .hint-text { font-size: 12px; color: #718096; margin: 0 0 12px 0; line-height: 1.5; }
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px; background: white; }
+        table { width: 100%; border-collapse: collapse; text-align: center; }
+        th, td { padding: 12px 8px; border-bottom: 1px solid #edf2f7; font-size: 14px; vertical-align: middle; }
+        th { background: var(--church-purple); color: white; font-weight: 600; white-space: nowrap; }
+        tr.today-row { background-color: #f0fff4; }
+        tr.locked-row { background-color: #f8fafc; color: #a0aec0; }
+        .day-status { display: block; font-size: 11px; font-weight: normal; margin-top: 2px; }
+        .tracker-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--church-purple); }
+        .tracker-checkbox:disabled { cursor: not-allowed; opacity: 0.45; }
+        .actions-section { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        button { border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-submit { background: #25D366; color: white; }
+        .btn-reset { background: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; padding: 10px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="church-logo">⛪</div>
+            <h1>كنيسة الملاك ميخائيل</h1>
+            <p class="subtitle">المفكرة الروحية اليومية (7 أيام من بداية تسجيلك)</p>
+        </header>
+
+        <div class="daily-banner" id="dailyBanner">
+            <span id="todayLabel">📅 ابدأ تسجيل يومك الأول ليبدأ عدّاد الـ 7 أيام</span>
+            <span class="timer-badge" id="countdownTimer">⏳ 24:00:00</span>
+        </div>
+
+        <div class="user-info-section">
+            <div class="input-group">
+                <label for="userName">إسم الخادم / المخدوم:</label>
+                <input type="text" id="userName" placeholder="اكتب اسمك الثلاثي هنا...">
+            </div>
+            <div class="input-group">
+                <label for="weekSelect">تحديد الأسبوع:</label>
+                <select id="weekSelect">
+                    <option value="الأسبوع الأول">الأسبوع الأول</option>
+                    <option value="الأسبوع الثاني">الأسبوع الثاني</option>
+                    <option value="الأسبوع الثالث">الأسبوع الثالث</option>
+                    <option value="الأسبوع الرابع">الأسبوع الرابع</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-bar-container"><div id="progressBar" class="progress-bar"></div></div>
+            <p class="progress-text">نسبة الإنجاز الإجمالية للأسبوع: <span id="progressPercent">0%</span></p>
+        </div>
+
+        <div class="weekly-tracker">
+            <h3 class="section-title">📊 جدول المتابعة اليومية</h3>
+            <p class="hint-text">* بمجرد أول تسجيل لك في الأسبوع، يبدأ عدّاد 7 أيام متتالية (24 ساعة لكل يوم) ثم يُغلق الأسبوع نهائياً. خانات (باكر، النوم، كتاب مقدس) متاحة لليوم الحالي فقط، بينما (التناول والاجتماع) متاحة طوال الـ 7 أيام.</p>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اليوم</th>
+                            <th>باكر</th>
+                            <th>النوم</th>
+                            <th>كتاب مقدس</th>
+                            <th>التناول 🔓</th>
+                            <th>الاجتماع 🔓</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trackerBody">
+                        <tr class="day-row"><td style="font-weight:bold;">السبت<span class="day-status"></span></td><td><input type="checkbox" class="tracker-checkbox" data-day="0" data-activity="matins"></td><td><input type="checkbox" class="tracker-checkbox" data-day="0" data-activity="sleeping"></td><td><input type="checkbox" class="tracker-checkbox" data-day="0" data-activity="bible"></td><td><input type="checkbox" class="tracker-checkbox" data-day="0" data-activity="communion"></td><td><input type="checkbox" class="tracker-checkbox" data-day="0" data-activity="meeting"></td></tr>
+                        <tr class="day-row"><td style="font-weight:bold;">الأحد<span class="day-status"></span></td><td><input type="checkbox" class="tracker-checkbox" data-day="1" data-activity="matins"></td><td><input type="checkbox" class="tracker-checkbox" data-day="1" data-activity="sleeping"></td><td><input type="checkbox" class="tracker-checkbox" data-day="1" data-activity="bible"></td><td><input type="checkbox" class="tracker-checkbox" data-day="1" data-activity="communion"></td><td><input type="checkbox" class="tracker-checkbox" data-day="1" data-activity="meeting"></td></tr>
+                        <tr class="day-row"><td style="font-weight:bold;">الإثنين<span class="day-status"></span></td><td><input type="checkbox" class="tracker-checkbox" data-day="2" data-activity="matins"></td><td><input type="checkbox" class="tracker-checkbox" data-day="2" data-activity="sleeping"></td><td><input type="checkbox" class="tracker-checkbox" data-day="2" data-activity="bible"></td><td><input type="checkbox" class="tracker-checkbox" data-day="2" data-activity="communion"></td><td><input type="checkbox" class="tracker-checkbox" data-day="2" data-activity="meeting"></td></tr>
+                        <tr class="day-row"><td style="font-weight:bold;">الثلاثاء<span class="day-status"></span></td><td><input type="checkbox" class="tracker-checkbox" data-day="3" data-activity="matins"></td><td><input type="checkbox" class="tracker-checkbox" data-day="3" data-activity="sleeping"></td><td><input type="checkbox" class="tracker-checkbox" data-day="3" data-activity="bible"></td><td><input type="checkbox" class="tracker-checkbox" data-day="3" data-activity="communion"></td><td><input type="checkbox" class="tracker-checkbox" data-day="3" data-activity="meeting"></td></tr>
+                        <tr class="day-row"><td style="font-weight:bold;">الأربعاء<span class="day-status"></span></td><td><input type="checkbox" class="tracker-checkbox" data-day="4" data-activity="matins"></td><td><input type="checkbox" class="tracker-checkbox" data-day="4" data-activity="sleeping"></td><td><input type="checkbox" class="tracker-checkbox" data-day="4" data-activity="bible"></td><td><input type="checkbox" class="tracker-checkbox" data-day="4" data-activity="communion"></td><td><input type="checkbox" class="tracker-checkbox" data-day="4" data-activity="meeting"></td></tr>
+                        <tr class="day-row"><td style="font-weight:bold;">الخميس<span class="day-status"></span></td><td><input type="checkbox" class="tracker-checkbox" data-day="5" data-activity="matins"></td><td><input type="checkbox" class="tracker-checkbox" data-day="5" data-activity="sleeping"></td><td><input type="checkbox" class="tracker-checkbox" data-day="5" data-activity="bible"></td><td><input type="checkbox" class="tracker-checkbox" data-day="5" data-activity="communion"></td><td><input type="checkbox" class="tracker-checkbox" data-day="5" data-activity="meeting"></td></tr>
+                        <tr class="day-row"><td style="font-weight:bold;">الجمعة<span class="day-status"></span></td><td><input type="checkbox" class="tracker-checkbox" data-day="6" data-activity="matins"></td><td><input type="checkbox" class="tracker-checkbox" data-day="6" data-activity="sleeping"></td><td><input type="checkbox" class="tracker-checkbox" data-day="6" data-activity="bible"></td><td><input type="checkbox" class="tracker-checkbox" data-day="6" data-activity="communion"></td><td><input type="checkbox" class="tracker-checkbox" data-day="6" data-activity="meeting"></td></tr>
+</tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="actions-section">
+            <button type="button" id="submitBtn" class="btn-submit">📤 إرسال التقرير </button>
+            <button type="button" id="resetBtn" class="btn-reset">🔄 إعادة ضبط بيانات الأسبوع الحالي</button>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const dayNames = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+            const DAY_MS = 86400000;
+            const WEEK_MS = 7 * DAY_MS;
+
+            const userNameInput = document.getElementById('userName');
+            const weekSelect = document.getElementById('weekSelect');
+            const dailyBanner = document.getElementById('dailyBanner');
+            const todayLabel = document.getElementById('todayLabel');
+            const countdownTimer = document.getElementById('countdownTimer');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+
+            const getStorageKey = () => `archangel_diary_${weekSelect.value}`;
+            const loadData = () => {
+                const savedName = localStorage.getItem('archangel_username');
+                if (savedName) userNameInput.value = savedName;
+                return JSON.parse(localStorage.getItem(getStorageKey()) || '{"startTime":null,"checks":{}}');
+            };
+            const saveData = (data) => localStorage.setItem(getStorageKey(), JSON.stringify(data));
+
+            function formatTime(ms) {
+                if (ms <= 0) return "00:00:00";
+                const s = Math.floor(ms / 1000);
+                return [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60]
+                    .map(v => String(v).padStart(2, '0')).join(':');
+            }
+
+            function updateUI() {
+                const data = loadData();
+                const now = Date.now();
+                let activeDay = -1, isClosed = false;
+
+                if (!data.startTime) {
+                    dailyBanner.classList.remove('closed-week');
+                    todayLabel.textContent = "📅 ابدأ تسجيل يومك الأول ليبدأ عدّاد الـ 7 أيام";
+                    countdownTimer.textContent = "⏳ 24:00:00";
+                } else {
+                    const elapsed = now - data.startTime;
+                    if (elapsed >= WEEK_MS) {
+                        isClosed = true;
+                        dailyBanner.classList.add('closed-week');
+                        todayLabel.textContent = "🔒 انتهت مدة الـ 7 أيام وأُغلق هذا الأسبوع";
+                        countdownTimer.textContent = "00:00:00";
+                    } else {
+                        dailyBanner.classList.remove('closed-week');
+                        activeDay = Math.floor(elapsed / DAY_MS);
+                        todayLabel.textContent = `📅 اليوم الحالي: ${dayNames[activeDay]} (اليوم ${activeDay + 1} من 7)`;
+                        countdownTimer.textContent = `⏳ ${formatTime(DAY_MS - (elapsed % DAY_MS))}`;
+                    }
+                }
+
+                let checkedCount = 0;
+                document.querySelectorAll('.day-row').forEach((row, idx) => {
+                    const status = row.querySelector('.day-status');
+                    row.className = 'day-row';
+                    if (!data.startTime) status.textContent = "متاح للبدء";
+                    else if (isClosed) { row.classList.add('locked-row'); status.textContent = "مغلق 🔒"; }
+                    else if (idx === activeDay) { row.classList.add('today-row'); status.textContent = "اليوم الحالي ✅"; }
+                    else { row.classList.add('locked-row'); status.textContent = idx < activeDay ? "انتهى ⏳" : "قادم 🕒"; }
+
+                    row.querySelectorAll('.tracker-checkbox').forEach(cb => {
+                        const act = cb.dataset.activity;
+                        cb.checked = !!data.checks[`${idx}_${act}`];
+                        if (cb.checked) checkedCount++;
+                        cb.disabled = isClosed ? true : (!data.startTime ? false : ((act === 'communion' || act === 'meeting') ? false : idx !== activeDay));
+                    });
+                });
+
+                const pct = Math.round((checkedCount / 35) * 100);
+                progressBar.style.width = `${pct}%`;
+                progressPercent.textContent = `${pct}%`;
+            }
+
+            userNameInput.addEventListener('input', () => localStorage.setItem('archangel_username', userNameInput.value));
+            weekSelect.addEventListener('change', updateUI);
+
+            document.querySelectorAll('.tracker-checkbox').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const data = loadData();
+                    const idx = Number(cb.dataset.day);
+                    if (!data.startTime) data.startTime = Date.now() - (idx * DAY_MS);
+                    data.checks[`${idx}_${cb.dataset.activity}`] = cb.checked;
+                    saveData(data);
+                    updateUI();
+                });
+            });
+
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbye3x7KSO2t-j8epXc9lc95pUXCprQL7aTy91ume8lyo3-TKr0yYaZJVrmkaspA3FfMAQ/exec";
+
+            document.getElementById('submitBtn').addEventListener('click', async () => {
+                const name = userNameInput.value.trim();
+                if (!name) return alert("من فضلك اكتب اسم الخادم أو المخدوم أولاً.");
+
+                const data = loadData();
+                const actKeys = ["matins", "sleeping", "bible", "communion", "meeting"];
+                const detailsMatrix = dayNames.map((_, dayIdx) =>
+                    actKeys.map(act => !!data.checks[`${dayIdx}_${act}`])
+                );
+
+                const payload = {
+                    name: name,
+                    week: weekSelect.value,
+                    percent: progressPercent.textContent,
+                    details: detailsMatrix
+                };
+
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = true;
+                btn.textContent = "⏳ جاري الحفظ في الإكسل...";
+
+                try {
+                    await fetch(SCRIPT_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    alert("✅ تم إرسال وحفظ بياناتك بنجاح في الإكسل!");
+                } catch (err) {
+                    alert("❌ حدث خطأ أثناء الإرسال، تأكد من الاتصال بالإنترنت.");
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = "☁️ حفظ وإرسال البيانات للخادم";
+                }
+            });
+
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                if (confirm(`هل أنت متأكد من مسح بيانات (${weekSelect.value})؟`)) {
+                    localStorage.removeItem(getStorageKey());
+                    updateUI();
+                }
+            });
+
+            updateUI();
+            setInterval(updateUI, 1000);
+        };
+    </script>
+</body>
+</html>

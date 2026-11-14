@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الأدمن - مفكرة كنيسة الملاك ميخائيل</title>
+    <style>
+        :root {
+            --church-purple: #4a154b;
+            --gold: #d4af37;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --success: #2ecc71;
+            --primary-blue: #3498db;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .admin-container {
+            width: 100%;
+            max-width: 1050px;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .church-logo { font-size: 40px; margin-bottom: 5px; }
+        header h1 { color: var(--church-purple); margin: 0; font-size: 24px; }
+        .subtitle { margin: 5px 0 0; color: #718096; font-size: 14px; font-weight: 500; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #fffaf0;
+            border: 1px solid #feebc8;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-card h4 { margin: 0 0 6px 0; font-size: 13px; color: #718096; }
+        .stat-card .stat-value { font-size: 22px; font-weight: bold; color: var(--church-purple); }
+        .controls-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 220px;
+        }
+        .filter-group label { font-size: 13px; font-weight: bold; color: var(--church-purple); }
+        input[type="text"], select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+        .btn-refresh {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            align-self: flex-end;
+        }
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: center; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #edf2f7; font-size: 14px; vertical-align: middle; }
+        th { background-color: var(--church-purple); color: white; font-weight: 600; white-space: nowrap; }
+        tr:hover { background-color: #f8fafc; }
+        .badge-percent {
+            background-color: #f0fff4;
+            color: #276749;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: 1px solid #c6f6d5;
+            display: inline-block;
+        }
+        .details-btn {
+            background: var(--church-purple);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 650px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .close-btn { font-size: 24px; font-weight: bold; cursor: pointer; color: #a0aec0; line-height: 1; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <div class="church-logo">⛪</div>
+            <h1>كنيسة الملاك ميخائيل - لوحة تحكم الأدمن</h1>
+            <p class="subtitle">متابعة إجابات المفكرة الروحية اليومية (أحدث تحديث لكل أسبوع)</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>👥 عدد السجلات المعروضة</h4>
+                <div class="stat-value" id="totalRecords">0</div>
+            </div>
+            <div class="stat-card">
+                <h4>📈 متوسط نسبة الإنجاز</h4>
+                <div class="stat-value" id="avgPercent" style="color: var(--success);">0%</div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="filter-group">
+                <label for="searchInput">🔍 بحث بالاسم:</label>
+                <input type="text" id="searchInput" placeholder="اكتب اسم الخادم أو المخدوم...">
+            </div>
+            <div class="filter-group">
+                <label for="weekFilter">📅 تصفية بالأسبوع:</label>
+                <select id="weekFilter">
+                    <option value="ALL">جميع الأسابيع</option>
+                    <option value="الأسبوع الأول">الأسبوع الأول</option>
+                    <option value="الأسبوع الثاني">الأسبوع الثاني</option>
+                    <option value="الأسبوع الثالث">الأسبوع الثالث</option>
+                    <option value="الأسبوع الرابع">الأسبوع الرابع</option>
+                </select>
+            </div>
+            <button class="btn-refresh" onclick="fetchData()">🔄 تحديث البيانات</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الاسم</th>
+                        <th>الأسبوع</th>
+                        <th>نسبة الإنجاز</th>
+                        <th>آخر تحديث</th>
+                        <th>تفاصيل الإجابات</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding: 20px;">جاري تحميل البيانات...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle" style="color: var(--church-purple); margin:0;">تفاصيل الإجابات</h3>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody" class="table-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbye3x7KSO2t-j8epXc9lc95pUXCprQL7aTy91ume8lyo3-TKr0yYaZJVrmkaspA3FfMAQ/exec";
+        let allData = [];
+        let displayedData = [];
+
+        const days = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+        const activities = ["باكر", "النوم", "كتاب مقدس", "التناول", "الاجتماع"];
+
+        function getLatestPerUserWeek(rawData) {
+            const map = new Map();
+            rawData.forEach(item => {
+                const name = (item.name || "").trim();
+                const week = (item.week || "").trim();
+                const key = `${name}_${week}`;
+                map.set(key, item);
+            });
+            return Array.from(map.values());
+        }
+
+        async function fetchData() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">جاري جلب البيانات من Google Sheets...</td></tr>';
+            
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                allData = getLatestPerUserWeek(data);
+                applyFilters();
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#e53e3e; padding: 20px;">❌ تعذر جلب البيانات: ' + error.message + '</td></tr>';
+            }
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.trim().toLowerCase();
+            const week = document.getElementById('weekFilter').value;
+
+            displayedData = allData.filter(item => {const matchName = (item.name || "").toLowerCase().includes(search);
+                const matchWeek = (week === "ALL") || (item.week === week);
+                return matchName && matchWeek;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('dataTableBody');
+            document.getElementById('totalRecords').textContent = displayedData.length;
+
+            if (displayedData.length === 0) {
+                document.getElementById('avgPercent').textContent = "0%";
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">لا توجد سجلات مسجلة في الإكسل حتى الآن.</td></tr>';
+                return;
+            }
+
+            let sum = 0;
+            tbody.innerHTML = displayedData.map((item, index) => {
+                const num = parseInt(item.percent) || 0;
+                sum += num;
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td style="font-weight:bold;">${item.name}</td>
+                        <td>${item.week}</td>
+                        <td><span class="badge-percent">${item.percent}</span></td>
+                        <td style="font-size:12px; color:#718096;">${item.updatedAt || '-'}</td>
+                        <td><button class="details-btn" onclick="openDetails(${index})">👁️ عرض التفاصيل</button></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('avgPercent').textContent = Math.round(sum / displayedData.length) + "%";
+        }
+
+        function openDetails(index) {
+            const item = displayedData[index];
+            document.getElementById('modalTitle').textContent = `تفاصيل: ${item.name} (${item.week})`;
+            
+            let html = `<table><thead><tr><th>اليوم</th>${activities.map(a => `<th>${a}</th>`).join('')}</tr></thead><tbody>`;
+            days.forEach((day, dIdx) => {
+                const rowChecks = (item.details && item.details[dIdx]) || [];
+                html += `<tr><td style="font-weight:bold;">${day}</td>${activities.map((_, aIdx) => `<td>${rowChecks[aIdx] ? '✅' : '❌'}</td>`).join('')}</tr>`;
+            });
+            html += `</tbody></table>`;
+
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('detailsModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('weekFilter').addEventListener('change', applyFilters);
+        window.onload = fetchData;
+    </script>
+</body>
+</html> 
